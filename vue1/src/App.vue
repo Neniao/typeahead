@@ -4,7 +4,9 @@
     
     <autocomplete 
       :search="search"
-      placeholder="Search for a state">
+      placeholder="Search states and territories"
+      :get-result-value="getResultValue"
+      autoSelect="true">
     </autocomplete>
   </div>
 </template>
@@ -76,26 +78,34 @@ export default {
   },
   methods: {
     search(input) {
-      var answer = ["America","British","Canada","Australia"]
+      //var answer = ["America","British","Canada","Australia"]
       console.log("request sent")
-      if (input.length < 1) { return [] }
-      axios({
-        method: 'POST',
-        url:'http://localhost:4000/graphql',
-        headers:{
-          'Content-Type':'application/json',
-          
-        },
-        data:{
-          "query":`{state(ahead:"${input}")}`
-        }
-      }).then(res =>{
-        console.log(res.data.data.state)
-        //this.search=res.data.data.state
-        //this.result=res.data.data.state
+      return new Promise((resolve)=>{
+        if (input.length < 1) { return resolve([]) }
+        axios({
+          method: 'POST',
+          url:'http://localhost:4000/graphql',
+          headers:{
+            'Content-Type':'application/json',
+            
+          },
+          data:{
+            "query":`{state(ahead:"${input}")}`
+          }
+        }).then(res =>{
+          console.log(res.data.data.state)
+          //this.search=res.data.data.state
+          //this.result=res.data.data.state
+          resolve(res.data.data.state)
+        })
       })
-      return answer
       
+    },
+
+    getResultValue(result) {
+      console.log("in resolve")
+      console.log(result)
+      return result
     }
   }
 }
